@@ -1,33 +1,39 @@
 document.addEventListener("DOMContentLoaded", () => {
   const transactionDetails = document.querySelector(".transaction-details");
-
-  if (transactionDetails) {
-    const button = document.createElement("button");
-    button.id = "copyCurl";
-    button.innerText = "Copy cURL";
+    
+    if (transactionDetails) {
+      const button = document.createElement("button");
+      button.id = "copyCurl";
+      button.innerText = "Copy cURL";
     button.style.cssText = "position: absolute; top: 20px; right: 20px;";
-    transactionDetails.appendChild(button);
-      
-    button.addEventListener("click", () => {
-      console.log("Button clicked!");
-      chrome.storage.local.get(["lastResponse"], (data) => {
-        console.log(data);
-        if (data.lastResponse) {
-          const curlCommand = generateCurlCommand(data.lastResponse);
-          navigator.clipboard.writeText(curlCommand).then(() => {
-            alert("cURL command copied!");
-          }).catch((error) => {
-            console.error("Clipboard error:", error);
-          });
-        } else {
-          console.error("No data available.");
-        }
+      transactionDetails.appendChild(button);
+
+      button.addEventListener("click", () => {
+        console.log("Button clicked!");
+        chrome.storage.local.get(["lastResponse"], (data) => {
+          if (data.lastResponse) {
+            const curlCommand = generateCurlCommand(data.lastResponse);
+            navigator.clipboard.writeText(curlCommand).catch((error) => {
+              console.error("Clipboard error:", error);
+            });
+          } else {
+            console.error("No data available.");
+          }
+        });
       });
-    });
-  } else {
-    console.error("Transaction details not found.");
-  }
+    }
 });
+
+function showTooltip(button, message) {
+  const tooltip = document.createElement("span");
+  tooltip.innerText = message;
+  tooltip.className = "copy-tooltip";
+  button.appendChild(tooltip);
+  
+  setTimeout(() => {
+    button.removeChild(tooltip);
+  }, 1200);
+}
 
   function generateCurlCommand(responseData) {
     try {

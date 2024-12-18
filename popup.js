@@ -1,15 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById("copyCurl");
+  const buttonContainer = document.querySelector(".button-container");
 
   if (button) {
     button.addEventListener("click", () => {
       console.log("Button clicked!");
       chrome.storage.local.get(["lastResponse"], (data) => {
-        console.log(data);
         if (data.lastResponse) {
           const curlCommand = generateCurlCommand(data.lastResponse);
           navigator.clipboard.writeText(curlCommand).then(() => {
-            alert("cURL command copied!");
+            showTooltip(buttonContainer, "Copied!");
           }).catch((error) => {
             console.error("Clipboard error:", error);
           });
@@ -22,6 +22,17 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("Button not found!");
   }
 });
+
+function showTooltip(button, message) {
+  const tooltip = document.createElement("span");
+  tooltip.innerText = message;
+  tooltip.className = "copy-tooltip";
+  button.appendChild(tooltip);
+  
+  setTimeout(() => {
+    button.removeChild(tooltip);
+  }, 1200); 
+}
 
 function generateCurlCommand(responseData) {
   try {
